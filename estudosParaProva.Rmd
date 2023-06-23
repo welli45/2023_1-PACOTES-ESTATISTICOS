@@ -36,4 +36,5 @@ x = matrix(rnorm(40), 5)
 dimnames(x) = list(NULL, head(LETTERS, ncol(x)))
 panderOptions("digits", 2)
 pander(x)
+x
 ```
