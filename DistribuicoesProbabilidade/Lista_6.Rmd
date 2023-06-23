@@ -1,0 +1,220 @@
+---
+title: "Lista de Exercícios 6 - Pacotes Estatísticos"
+author: "Wellington Santos Souza (2019012213)"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Exercícios
+
+## Questão 1
+
+Sendo X uma variável seguindo o modelo Poisson com parâmetro $\lambda = 8$, apenas utilizando comandos do R, calcule:
+
+a) $P(X \le 14)$
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+ppois(14,lambda = 8)
+```
+
+b) $(X < 4 ~ou~ X \ge 12)$
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+ppois(12, lambda = 8, lower.tail = F) + ppois(3, lambda = 8)
+```
+
+c) $P(X \le 9 ~|~ X \ge 7)$
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+(ppois(9, 8) - ppois(7, 8)) / ppois(7, 8, lower.tail = F)
+```
+
+## Questão 2
+
+Para $X \sim N(75, 30)$, utilizando comandos do R obtenha:
+
+a) $P(X \le 60)$
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+pnorm(60, mean = 75, sd = sqrt(30))
+```
+b) $P(X \ge 65)$
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+pnorm(65, mean = 75, sd = sqrt(30), lower.tail = F)
+```
+c) $P(65 < X < 90)$
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+pnorm(90, mean = 75, sd = sqrt(30)) - pnorm(65, mean = 75, sd = sqrt(30))
+```
+d) O valor de b tal que $P(X < b) = 0.01$
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+qnorm(0.01, mean = 75, sd = sqrt(30))
+```
+e) O valor de b tal que $P(X < b) = 0.90$
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+qnorm(0.90, mean = 75, sd = sqrt(30))
+```
+
+## Questão 3
+
+Faça: 
+
+a) O gráfico da função de probabilidade discreta de uma variável com distribuição de probabilidade da distribuição Poisson com parâmetro $\lambda = 5$. Dica: O limite do eixo x deve ir até um valor cuja a probabilidade já seja bem pequena.
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+x <- 2:20
+fx <- dpois(x,lambda = 5)
+plot(x, fx, type = 'h', col = "blue", ylab = "P(X = x)")
+title("Gráfico \n Distribuição de Poison")
+```
+
+b) Um gráfico com as funções densidades das variáveis $X \sim t_1$ (t-Student com 1 grau de liberdade), $Y \sim t_5 ~e~ Z \sim N(0, 1)$ (sobrepostas no mesmo gráfico). Edite adequadamente a escala dos eixos e coloque uma legenda diferenciando as curvas.Diferencie as curvas quanto a cor e tipo de traço.
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# definindo as três funções densidades de probabilidade
+fx <- function(x) dt(x, df=1)
+fy <- function(x) dt(x, df=5)
+fz <- function(x) dnorm(x)
+
+# traçando as curvas
+plot(fz, from=-6, to=6, col="green", lty=3, lwd=1.5, ylab="Densidade", xlab="Valores")
+plot(fx, from=-6, to=6, col="red", lty=1, lwd=1.5, add = TRUE)
+plot(fy, from=-6, to=6, col="blue", lty=2, lwd=1.5, add=TRUE)
+
+
+# adicionando a legenda
+legend("topright", c("X ~ t_1", "Y ~ t_5", "Z ∼ 𝑁(0,1)"), col=c("red", "blue", "green"), lty=c(1,2,3), lwd=2)
+title("Funções densidades")
+
+```
+c) Um gráfico com a função de densidade da variável $Y \sim t_{10}$. Considerando esta variável aleatória, encontre os quantis teóricos de ordem 2.5%, 50%, 97.5% e os represente no gráfico com linhas verticais.
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+y <- function(x) dt(x,10)
+
+plot(y, -5, 5, col = "blue", lty=1, lwd=2, ylab="Densidade", xlab="Valores")
+
+quantis <- qt(c(0.025, 0.5, 0.975), df = 10)
+
+abline(v = quantis, col = c("red", "green", "blue"), lty = 2, lwd = 2)
+
+legend("topright", c("25%", "50%", "75%"), col=c("red", "green", "blue"), lty=c(1,2,3), lwd=2)
+
+title("Distribuição t de Student \n com 10 graus de liberdade")
+```
+d) Refaça o gráfico anterior com a função de densidade da variável $Y \sim t_{10}. Desenhe uma área colorida representando um intervalo central com probabilidade de 95% de ocorrência.
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# definindo o número de pontos para o gráfico
+y <- function(x) dt(x,10)
+
+plot(y, -5, 5, col = "blue", lty=1, lwd=2, ylab="Densidade", xlab="Valores")
+
+quantis <- qt(c(0.025,0.975), df = 10)
+
+intervalo <- seq(from = quantis[1], to = quantis[2], length.out = 100)
+
+densidade_intervalo <- dt(intervalo, df = 10)
+
+polygon(c(quantis[1], intervalo, quantis[2]), c(0, densidade_intervalo, 0), 
+        col = "red", border = NA)
+
+abline(v = quantis, col = "blue", lty = 2, lwd = 2)
+
+title("Distribuição t de Student com 10 graus de liberdade e \n intervalo central com probabilidade de 95% de ocorrência")
+```
+## Questão 4
+
+Gere uma amostra de tamanho 3000 da distribuição Weibull com parâmetros de forma igual a 1 e de escala igual a 2. Faça o histograma de densidade com os valores gerados e sobreponha a curva da função de densidade teórica da mesma distribuição. Dica: A função density não retorna a densidade teórica e sim uma estimativa, logo não deve ser usada neste exercício.
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+y <- rweibull(3000, shape = 1, scale = 2)
+
+x <- seq(from = 0, to = 12, length.out = 3000)
+
+
+densidade_teorica <- dweibull(x, shape = 1, scale = 2)
+
+hist(y, freq = FALSE, breaks = 30, col = "blue", xlim = c(0, 12), ylim = c(0, 0.5), 
+     main = "Histograma de densidade da distribuição Weibull",
+     xlab = "X", ylab = "Densidade")
+lines(x, densidade_teorica, col = "red", lwd = 2)
+
+```
+
+## Questão 5
+
+Obtenha uma matriz seguindo as seguintes instruções:
+
++ Construa um vetor de tamanho 100 denotado como x0 contendo o valor 1 em todas as entradas;
+
++ Gere um vetor (denotado por x1) gerando 100 valores da distribuição uniforme contínua entre 0 a 1;
+
++ Gere um vetor (denominado por $\epsilon$) gerando 100 valores da distribuição normal com média 0 e variância igual 0.4;
+
++ Obtenha a matriz X, com 100 linhas e 2 colunas, formada pelos vetores x0 e x1;
+
++ Calcule o vetor y (ou matriz com uma coluna) resolvendo a conta matricial $y = X\beta + \epsilon$, em que $\beta = (0.5, 2)$ é um vetor coluna (2 linhas e uma coluna);
+
++ Obtenha a matriz A (com 100 linhas e 3 colunas) juntando o vetor y e a matriz X.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+x0 <- rep(1,100)
+
+x1 <- runif(100)
+
+epsilon <- rnorm(100, mean = 0, sd = sqrt(0.4))
+
+# matriz X
+X <- matrix(data = c(x0,x1), ncol = 2, nrow = 100)
+
+# definindo os betas
+beta <- c(0.5, 2)
+
+# calculando o vetor y
+y <- X %*% beta + epsilon
+
+# matriz A
+A <- cbind(y, X)
+```
+
+6 primeiras linhas da Matriz X
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+head(X)
+```
+
+6 primeiras linhas da Matriz A
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+head(A)
+```
+
+
+## Questão 6
+
+Uma distribuição de probabilidade Normal assimetrica padrão possui função de densidade dada por:
+$$
+f(z)=2\phi(z)\Phi(z\lambda),
+$$
+em que $\phi(.)$ $\Phi(.)$ são as funções de densidade e de probabilidade acumulada da distribuição Normal padrão (dnorm e pnorm). Construa uma função que receba como argumento o parâmetro de assimetria$\lambda$ e calcule o valor da densidade da distribuição normal assimétrica. Faça um gráfico da função de densidade, com 3 curvas, considerando 3 valores diferentes para $\lambda$.
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# função de densidade 
+fz <- function(z, lambda){(2*dnorm(z))*pnorm(z * lambda, lower.tail = F)}
+
+z <- seq(-4, 4, by = 0.1)
+
+a <- fz(z, 0.2)
+
+b <- fz(z, 0.8)
+
+c <- fz(z, 1)
+
+plot(z, c, type = "l", col = "red", lwd = 2, ylab = "Densidade",
+     xlab = "z", main = "Distribuição Normal Assimétrica Padrão")
+
+lines(z, b, type = "l", col = "blue", lwd = 2)
+
+lines(z, a, type = "l", col = "green", lwd = 2)
+
+legend("topright", legend = c("lambda = 1", "lambda = 0.8", "lambda = 0.2"),
+       col = c("red", "blue", "green"), lwd = 2, cex = 0.8)
+
+```
+

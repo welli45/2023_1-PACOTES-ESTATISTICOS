@@ -1,0 +1,69 @@
+[13516:13520:2023-6-14 15:16:43.974] Main Start
+[13516:13520:2023-6-14 15:16:43.975] Command line:"C:\Users\welli\OneDrive - Universidade Federal de Minas Gerais\1_CIÊNCIA SOCIAIS\2023_1\2023_1 - PACOTES ESTATISTICOS\ManipulacaoDadosTidyverse\Zoom_cm_fk84ky5kuZ9vvrZo4_mWDJHXFpDLjzdB2xj6lxh6zWZwdttui1iddaV@us2JTPi0RrtylgYo_k710cb1b72e439.exe"  Instance:0x440000 Show State:1
+[13516:13520:2023-6-14 15:16:44.26] C:\
+[13516:13560:2023-6-14 15:16:44.33] [process_requst] start, url:https://elsevier.zoom.us/conf/launch
+[13516:13560:2023-6-14 15:16:44.870] [req_state_read_status_code] zHttpQueryInfo complete, status:200
+[13516:13560:2023-6-14 15:16:44.870] [req_state_read_status_code] zHttpQueryInfo complete, status:200 Error: 0
+[13516:13560:2023-6-14 15:16:44.870] [read_response_content] API call zHttpQueryInfo failed, error: 12150
+[13516:13560:2023-6-14 15:16:44.872] [log_response_content] Content length (1048576 as unknown):1048576 , Total read: 1301 , Error No: 0 , Status code: 200
+[13516:13560:2023-6-14 15:16:44.872] [log_response_content] header:
+[13516:13560:2023-6-14 15:16:44.872] HTTP/1.1 200 OK
+Date: Wed, 14 Jun 2023 18:16:44 GMT
+Content-Type: text/plain;charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+x-zm-trackingid: v=2.0;clid=aw1;rid=WEB_face248c95b5890555529ab698e5459f
+x-content-type-options: nosniff
+content-security-policy: upgrade-insecure-requests; default-src https://*.zoom.us https://zoom.us blob: 'self'; img-src https: about: blob: data: 'self'; style-src https: safari-extension: chrome-extension: 'unsafe-inline' data: 'self'; font-src https: safari-extension: chrome-extension: blob: data: 'self'; connect-src * about: blob: data: 'self'; media-src * rtmp: blob: data: 'self'; frame-src https: ms-appx-web: zoommtg: zoomus: wvjbscheme: data: blob: 'self'; object-src 'none'; base-uri 'none';
+x-frame-options: SAMEORIGIN
+set-cookie: zm_aid=""; Domain=.zoom.us; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/; Secure; HttpOnly
+x-zm-zoneid: VA
+strict-transport-security: max-age=31536000; includeSubDomains
+x-xss-protection: 1; mode=block
+referrer-policy: strict-origin-when-cross-origin
+CF-Cache-Status: DYNAMIC
+Set-Cookie: zm_haid=""; Domain=.zoom.us; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/; Secure; HttpOnly
+Set-Cookie: zm_tmaid=""; Domain=.zoom.us; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/; Secure; HttpOnly
+Set-Cookie: zm_htmaid=""; Domain=.zoom.us; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/; Secure; HttpOnly
+Set-Cookie: cred=AB96999734227217FC111AB5CE9D06A2; Path=/; Secure; HttpOnly
+Set-Cookie: _zm_page_auth=aw1_c_oZ9E16AyTZ2D0BmUWFpvPQ; Domain=.zoom.us; Path=/; Secure; HttpOnly
+Set-Cookie: _zm_ssid=aw1_c_jaYNqoS4SPe-bUYIUU9Jgw; Domain=.zoom.us; Path=/; Secure; HttpOnly
+Set-Cookie: _zm_ctaid=fbQXdjFYRsmf47FstNV5AQ.1686766604318.3c81938775d58c9d6b6ef40533c10302; Domain=.zoom.us; Expires=Wed, 14-Jun-2023 20:16:44 GMT; Path=/; Secure; HttpOnly
+Set-Cookie: _zm_chtaid=503; Domain=.zoom.us; Expires=Wed, 14-Jun-2023 20:16:44 GMT; Path=/; Secure; HttpOnly
+Set-Cookie: _zm_mtk_guid=32b58891133446d59d8f95b1cafb017e; Domain=.zoom.us; Expires=Fri, 13-Jun-2025 18:16:44 GMT; Path=/; Secure
+Set-Cookie: __cf_bm=mgO9t9rWqaGEOf1EcuU9JURSgTFPW1FwAK4.NYRTcrY-1686766604-0-AT7gbik1I+667kOvGr4rv0W3V4owe4nOTBQiyH37j4Ei5Y9knj5cFuzA1rJaAtBwvPD8gw0+oszR/jO9pFzLDKA=; path=/; expires=Wed, 14-Jun-23 18:46:44 GMT; domain=.zoom.us; HttpOnly; Secure; SameSite=None
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v3?s=V19EoiNRGFvjELF5nULSaF91VUmT3P5%2BXWiHAvrZsUm8%2BgwITHt2SKDMxZOrcs0OCrEhvR%2FiJs4XTE4%2FQ%2FSW1mThlWF1%2FGQrey8Eum9guLve4JTaugcwv2sKILLh8m2HqrH94Bsu84%2BgJkmDaZA%3D"}],"group":"cf-nel","max_age":604800}
+NEL: {"success_fraction":0.01,"report_to":"cf-nel","max_age":604800}
+Server: cloudflare
+CF-RAY: 7d7490ec6fecd07e-CWB
+alt-svc: h3=":443"; ma=86400
+
+
+[13516:13560:2023-6-14 15:16:44.872] [process_requst] End for url:https://elsevier.zoom.us/conf/launch, return code:200, Error:0, Response content size:1301
+[13516:13520:2023-6-14 15:16:44.902] [client_has_installed_app] found path:
+[13516:13520:2023-6-14 15:16:44.902]  ***NULL-POINTER-PLACEHOLDER***
+[13516:13520:2023-6-14 15:16:44.903] [param_query_local_path] path is: C:\Users\welli\AppData\Roaming\Zoom\ZoomDownload\ dir create response : 1 system error: 1008
+[13516:13520:2023-6-14 15:16:44.903] [downloader_run] State:0
+[13516:13660:2023-6-14 15:16:44.904] [process_requst] start, url:https://zoom.us/client/latest/Installer.exe?archType=x64
+[13516:13520:2023-6-14 15:16:44.905] [client_has_installed_app] found path:
+[13516:13520:2023-6-14 15:16:44.905]  ***NULL-POINTER-PLACEHOLDER***
+[13516:13660:2023-6-14 15:16:45.512] [req_state_read_status_code] zHttpQueryInfo complete, status:200
+[13516:13660:2023-6-14 15:16:45.512] [req_state_read_status_code] zHttpQueryInfo complete, status:200 Error: 0
+[13516:13660:2023-6-14 15:16:45.752] [read_response_file] Status Code:200, content length: 1004352, total read: 1004352, error code: 0
+[13516:13660:2023-6-14 15:16:45.760] [process_requst] End for url:https://zoom.us/client/latest/Installer.exe?archType=x64, return code:200, Error:0, Response content size:0
+[13516:13520:2023-6-14 15:16:45.768] [handle_download_job_done] Index: 1 Curr index: 1 StatusCode: 200 Error: 0 Response is Empty. 
+[13516:13660:2023-6-14 15:16:46.104] [process_requst] start, url:https://zoom.us/client/latest/Zoom.msi?archType=x64
+[13516:13660:2023-6-14 15:16:46.475] [req_state_read_status_code] zHttpQueryInfo complete, status:200
+[13516:13660:2023-6-14 15:16:46.475] [req_state_read_status_code] zHttpQueryInfo complete, status:200 Error: 0
+[13516:13660:2023-6-14 15:16:53.484] [read_response_file] Status Code:200, content length: 32805539, total read: 32805539, error code: 0
+[13516:13660:2023-6-14 15:16:53.825] [process_requst] End for url:https://zoom.us/client/latest/Zoom.msi?archType=x64, return code:200, Error:0, Response content size:0
+[13516:13520:2023-6-14 15:16:53.827] [handle_download_job_done] Index: 2 Curr index: 2 StatusCode: 200 Error: 0 Response is Empty. 
+[13516:13520:2023-6-14 15:16:53.865] C:\Users\welli\AppData\Roaming\Zoom\ZoomDownload\Installer.exe
+[13516:13520:2023-6-14 15:16:53.865] ZInstaller --conf.mode=silent --ipc_wnd=328686
+[13516:13520:2023-6-14 15:16:54.386] [launch_silent_install] Installer process created, result:42
+[13516:13520:2023-6-14 15:17:37.189] C:\Users\welli\AppData\Roaming\Zoom\bin\Zoom.exe
+[13516:13520:2023-6-14 15:17:37.237] client_launch_app: 
+[13516:13520:2023-6-14 15:17:37.237] C:\Users\welli\AppData\Roaming\Zoom\bin\Zoom.exe
+[13516:13520:2023-6-14 15:17:37.237] "--url=zoommtg://win.launch?h.domain=zoom.us&h.path=join&stype=0&zc=0&action=join&confno=98009110360"
+[13516:13520:2023-6-14 15:17:37.627] [client_launch_app] Zoom app process created, result:42
+[13516:13520:2023-6-14 15:17:38.924] Main End

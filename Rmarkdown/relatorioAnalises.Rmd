@@ -1,0 +1,169 @@
+---
+title: "Relatório - Lista de exercícios 5"
+author: "Wellington Santos Souza - 2019012213"
+date: "2023-04-22"
+output: html_document
+---
+
+### Breve descrição do banco de dados e variáveis utilizadas
+
+```{r setup, include=FALSE}
+# pacotes usados na análise
+library(kableExtra)
+library(MASS)
+library(knitr)
+library(tidyverse)
+library(corrplot)
+library(vcd)
+```
+
+## Introdução
+
+O banco de dados **icu** contém informações de pacientes internados em Unidades de Terapia Intensiva (UTIs). Os dados foram coletados durante um estudo multicêntrico realizado em seis hospitais brasileiros.
+
+A base de dados "icu" contém informações de pacientes que foram internados em Unidades de Terapia Intensiva (UTI) em um hospital universitário. Os dados foram coletados durante um período de um ano e incluem informações demográficas, clínicas e de tratamento dos pacientes.
+
+**Variáveis utilizadas:**
+
++ age: idade do paciente
+
++ gender: gênero do paciente (1=masculino, 2=feminino)
+
++ race: raça do paciente (1=branco, 2=negro, 3=outro)
+
++ sta: status de alta da UTI (0=faleceu, 1=alta)
+
++ crn: creatinina (mg/dL) no momento da admissão na UTI
+
++ hra: frequência cardíaca (batimentos por minuto) no momento da admissão na UTI
+
++ po2: pressão parcial de oxigênio (mmHg) no momento da admissão na UTI
+
++ sys: Pressão arterial sistólica na admissão à UTI (mm Hg)
+
+### Tabela: dados do paciente
+
+```{r echo = FALSE}
+icu <- aplore3::icu
+icu %>%
+  select(age, gender, race, sta, crn, hra, po2) %>%
+  head(8) %>%
+  kable(align = "c") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE) %>%
+  add_header_above(c(" " = 1, "Dados do paciente" = 6)) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  column_spec(1, bold = TRUE) %>%
+  footnote(general = "O data frame icu tem 200 linhas e 21 colunas.") %>%
+  column_spec(1, bold = TRUE, width = "100px") %>%
+  column_spec(c(2:7), width = "150px")
+```
+
+```{r echo = FALSE}
+# Resumo estatístico das variáveis numéricas
+summary_icu <- summary(icu[c('age', 'gender', 'race', 'sta', 'crn', 'hra', 'po2')])
+
+# Formatando a tabela
+knitr::kable(summary_icu, digits = 2, col.names = c('age', 'gender', 'race', 'sta', 'crn', 'hra', 'po2'),
+             caption = "Resumo estatístico das variáveis",
+             align = c("l", "c", "c", "c", "c", "c", "c"))
+
+```
+
+A tabela apresenta um resumo estatístico das variáveis utlizadas para a análise no conjunto de dados "icu", incluindo idade (age), gênero (gender), raça (race), status (sta), creatinina (crn), frequência cardíaca (hra) e pressão parcial de oxigênio (po2).
+
+
+```{r echo = FALSE}
+ggplot(icu, aes(x = factor(gender))) +
+  geom_bar(fill = "steelblue", color = "white") +
+  scale_x_discrete(labels = c("Masculino", "Feminino")) +
+  labs(title = "Distribuição do gênero dos pacientes", x = "Gênero", y = "Frequência")
+
+```
+
+Este gráfico apresenta a distribuição dos pacientes em relação ao gênero (masculino e feminino). O eixo x representa as categorias de gênero e o eixo y representa a frequência em que cada categoria aparece no conjunto de dados. A altura das barras representa o número de pacientes em cada categoria.
+
+Podemos observar que há mais pacientes do gênero masculino do que do feminino neste conjunto de dados.
+```{r echo = FALSE}
+ggplot(icu, aes(x = age)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "white") +
+  labs(title = "Distribuição da idade dos pacientes", x = "Idade", y = "Frequência")
+
+```
+
+Este gráfico mostra a distribuição da idade dos pacientes. O eixo x representa a idade dos pacientes e o eixo y representa a frequência em que cada idade aparece no conjunto de dados. A altura das barras representa o número de pacientes com cada idade.
+
+Podemos observar que a maioria dos pacientes está concentrada na faixa etária entre 50 e 80 anos.
+
+```{r echo = FALSE}
+ggplot(icu, aes(x = gender, y = sys, fill = gender)) +
+  geom_boxplot() +
+  ggtitle("Boxplot de Pressão arterial sistólica por Gênero") +
+  xlab("Gênero") +
+  ylab("Pressão arterial sistólica")
+
+```
+
+Este gráfico apresenta a distribuição da pressão arterial sistólica em relação ao gênero dos pacientes. O eixo x representa as categorias de gênero e o eixo y representa a pressão arterial sistólica em mmHg. As caixas representam o intervalo interquartil (IQR) e a mediana (linha horizontal dentro da caixa). As linhas verticais que se estendem a partir das caixas são chamadas de "bigodes" e representam a amplitude dos dados que não são outliers (pontos individuais que estão fora do intervalo dos bigodes).
+
+Podemos observar que, em média, a pressão arterial sistólica é ligeiramente maior em pacientes do gênero masculino em comparação com o gênero feminino. Além disso, a amplitude dos dados é maior para pacientes do gênero masculino do que para pacientes do gênero feminino.
+
+```{r echo = FALSE}
+ggplot(icu, aes(x = type, fill = type)) +
+  geom_bar() +
+  ggtitle("Gráfico de Barras de Tipo de Admissão") +
+  xlab("Tipo de Admissão") +
+  ylab("Contagem")
+```
+
+Este gráfico apresenta a contagem de pacientes por tipo de admissão (tipo 1 e tipo 2). O eixo x representa as categorias de tipo de admissão e o eixo y representa a contagem de pacientes em cada categoria.
+
+Podemos observar que há mais pacientes no tipo de admissão 1 do que no tipo de admissão 2.
+
+```{r echo = FALSE}
+ggplot(icu, aes(x = sys, y = hra)) +
+  geom_point(size = 3) +
+  scale_color_gradient(low = "red", high = "blue") +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  ggtitle("Correlação entre Pressão Sistólica e Frequência Cardíaca") +
+  xlab("Pressão Sistólica (mm Hg)") +
+  ylab("Frequência Cardíaca (bpm)")
+```
+
+Este gráfico apresenta a relação entre a pressão arterial sistólica e a frequência cardíaca dos pacientes. O eixo x representa a pressão arterial sistólica em mmHg e o eixo y representa a frequência cardíaca em batimentos por minuto. Cada ponto representa um paciente e a cor do ponto indica o valor da pressão arterial sistólica.
+
+Podemos observar uma correlação negativa moderada entre a pressão arterial sistólica e a frequência cardíaca dos pacientes, o que significa que, em média, quanto maior a pressão arterial sistólica, menor a frequência cardíaca.
+
+```{r echo = FALSE}
+ggplot(icu, aes(x =type, fill = gender)) +
+  geom_bar(position = "dodge") +
+  ggtitle("Gráfico de Barras de Tipo de Admissão por Gênero") +
+  xlab("Tipo de Admissão") +
+  ylab("Contagem")
+```
+
+Pode-se observar que a maioria dos pacientes foram admitidos no hospital por meio de emergência e que a distribuição entre os gêneros é relativamente equilibrada.
+
+```{r echo = FALSE}
+
+# Seleciona as variáveis desejadas
+vars <- c("age","hra",'sys')
+df <- icu[, vars]
+
+# Calcula a matriz de correlação
+corr_matrix <- cor(df)
+
+# Gera a tabela de correlação colorida
+corrplot(corr_matrix, type = "lower", method = "color", 
+         addCoef.col = "black", tl.col = "black", tl.srt = 45)
+```
+
+Já a tabela de correlação mostra a correlação entre as variáveis selecionadas (idade, frequência cardíaca e pressão arterial sistólica), apresentada de forma colorida. É possível observar que a idade apresenta correlação positiva com a pressão arterial sistólica, ou seja, quanto maior a idade, maior tende a ser a pressão arterial sistólica. A frequência cardíaca, por sua vez, apresenta pouca correlação com as outras variáveis, ou seja, não há uma relação forte entre a frequência cardíaca e a idade ou a pressão arterial sistólica.
+
+## Conclusão
+
+Nesta análise exploratória, foram apresentadas algumas das informações disponíveis no conjunto de dados "icu", que contém informações de pacientes que foram internados em Unidades de Terapia Intensiva (UTI) em um hospital universitário.
+
+Foram apresentados gráficos de distribuição de algumas variáveis, como idade e gênero, além de um boxplot da pressão arterial sistólica por gênero e um gráfico de barras do status de alta da UTI por gênero. Também foi apresentada uma matriz de correlação das variáveis numéricas e uma tabela de contingência de gênero e raça.
+
+Essa análise pode ajudar a identificar possíveis associações entre as variáveis e orientar a escolha de modelos estatísticos para análises futuras.

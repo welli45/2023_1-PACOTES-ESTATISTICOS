@@ -1,0 +1,172 @@
+---
+title: "Lista de exercícios 5"
+author: "Wellington Santos Souza"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+# Breve descrição do banco de dados e variáveis utilizadas
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(kableExtra)
+library(MASS)
+library(knitr)
+library(tidyverse)
+library(corrplot)
+library(vcd)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Informações
+
+O banco de dados **icu** contém informações de pacientes internados em Unidades de Terapia Intensiva (UTIs). Os dados foram coletados durante um estudo multicêntrico realizado em seis hospitais brasileiros.
+
+A base de dados "icu" contém informações de pacientes que foram internados em Unidades de Terapia Intensiva (UTI) em um hospital universitário. Os dados foram coletados durante um período de um ano e incluem informações demográficas, clínicas e de tratamento dos pacientes.
+
+**Variáveis utilizadas:**
+
++ age: idade do paciente
+
++ gender: gênero do paciente (1=masculino, 2=feminino)
+
++ race: raça do paciente (1=branco, 2=negro, 3=outro)
+
++ sta: status de alta da UTI (0=faleceu, 1=alta)
+
++ crn: creatinina (mg/dL) no momento da admissão na UTI
+
++ hra: frequência cardíaca (batimentos por minuto) no momento da admissão na UTI
+
++ po2: pressão parcial de oxigênio (mmHg) no momento da admissão na UTI
+
++ sys: Pressão arterial sistólica na admissão à UTI (mm Hg)
+
+Column {data-width=450}
+-----------------------------------------------------------------------
+
+### Tabela: dados do paciente
+
+```{r}
+icu <- aplore3::icu
+icu %>%
+  select(age, gender, race, sta, crn, hra, po2) %>%
+  head(8) %>%
+  kable(align = "c") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE) %>%
+  add_header_above(c(" " = 1, "Dados do paciente" = 6)) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  column_spec(1, bold = TRUE) %>%
+  footnote(general = "O data frame icu tem 200 linhas e 21 colunas.") %>%
+  column_spec(1, bold = TRUE, width = "100px") %>%
+  column_spec(c(2:7), width = "150px")
+```
+
+# Análises
+
+## Column 1 {data-width=650}
+
+```{r}
+# Resumo estatístico das variáveis numéricas
+summary_icu <- summary(icu[c('age', 'gender', 'race', 'sta', 'crn', 'hra', 'po2')])
+
+# Formatando a tabela
+knitr::kable(summary_icu, digits = 2, col.names = c('age', 'gender', 'race', 'sta', 'crn', 'hra', 'po2'),
+             caption = "Resumo estatístico das variáveis",
+             align = c("l", "c", "c", "c", "c", "c", "c"))
+
+```
+
+
+### Gráfico de distribuição do gênero dos pacientes
+```{r}
+ggplot(icu, aes(x = factor(gender))) +
+  geom_bar(fill = "steelblue", color = "white") +
+  scale_x_discrete(labels = c("Masculino", "Feminino")) +
+  labs(title = "Distribuição do gênero dos pacientes", x = "Gênero", y = "Frequência")
+
+```
+
+## column 2 {data-width=350} Gráfico 2: Distribuição da idade dos pacientes
+```{r}
+ggplot(icu, aes(x = age)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "white") +
+  labs(title = "Distribuição da idade dos pacientes", x = "Idade", y = "Frequência")
+
+```
+
+# Análises 1
+
+## Column 1 {data-width=650}
+
+```{r}
+ggplot(icu, aes(x = gender, y = sys, fill = gender)) +
+  geom_boxplot() +
+  ggtitle("Boxplot de Pressão arterial sistólica por Gênero") +
+  xlab("Gênero") +
+  ylab("Pressão arterial sistólica")
+
+```
+
+
+## Column 2 {data-width=650} 
+```{r}
+ggplot(icu, aes(x = type, fill = type)) +
+  geom_bar() +
+  ggtitle("Gráfico de Barras de Tipo de Admissão") +
+  xlab("Tipo de Admissão") +
+  ylab("Contagem")
+
+```
+
+# Análises 2
+
+## Column 1 {data-width=650}
+
+
+```{r}
+ggplot(icu, aes(x = sys, y = hra)) +
+  geom_point(size = 3) +
+  scale_color_gradient(low = "red", high = "blue") +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  ggtitle("Correlação entre Pressão Sistólica e Frequência Cardíaca") +
+  xlab("Pressão Sistólica (mm Hg)") +
+  ylab("Frequência Cardíaca (bpm)")
+```
+
+## Column 2 {data-width=650}
+
+```{r}
+ggplot(icu, aes(x =type, fill = gender)) +
+  geom_bar(position = "dodge") +
+  ggtitle("Gráfico de Barras de Tipo de Admissão por Gênero") +
+  xlab("Tipo de Admissão") +
+  ylab("Contagem")
+
+```
+
+# Análises 3
+```{r}
+
+library(corrplot)
+
+# Seleciona as variáveis desejadas
+vars <- c("age","hra",'sys')
+df <- icu[, vars]
+
+# Calcula a matriz de correlação
+corr_matrix <- cor(df)
+
+# Gera a tabela de correlação colorida
+corrplot(corr_matrix, type = "lower", method = "color", 
+         addCoef.col = "black", tl.col = "black", tl.srt = 45)
+
+```
+

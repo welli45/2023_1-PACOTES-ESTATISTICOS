@@ -1,0 +1,172 @@
+---
+title: "Lista de Exercícios 10"
+author: "Autor 1 (matricula) e autor 2 (matricula)"
+output:
+  html_document:
+    df_print: paged
+---
+
+<!-- EDITE AS INFORMAÇÕES ACIMA -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercícios
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(covid19br)
+library(tidyverse)
+library(ggiraph)
+library(ggplot2)
+library(lubridate)
+library(rgl)
+library(gganimate)
+library(geobr)
+library(leaflet)
+library(RColorBrewer)
+library(ggvis)
+library(plotly)
+library(trelliscopejs)
+```
+
+## Questão 1
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+dados_covid19 <- downloadCovid19("state")
+
+q1 <- dados_covid19 |>  
+  filter(state %in% c("MG","BA") & between(date, as.Date("2021-01-01"), as.Date("2021-02-28"))) |>  
+  ggplot()+
+  geom_line(aes(x = date, y = newCases, color = state))+
+  labs(title = "Novos casos de covid-19 para os estados da Bahia e Minas Gerais",
+       subtitle = "Primeiros meses de 2021",
+       x = "Ano",
+       y = NULL) + 
+  geom_point_interactive(aes(x=date, y=newCases, color = state,tooltip=newCases))
+                         
+ggiraph(code = print(q1))
+```
+
+## Questão 2
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q2 = function(x, y){
+  z = (cos(x^2+y^2)/2)
+}
+
+plot3d(f, col = colorRampPalette(c("red", "white")),
+xlab = "X", ylab = "Y", zlab = "Z",
+xlim = c(-5, 5), ylim = c(-5, 5),
+aspect = c(1, 1, 0.5))
+```
+
+## Questão 3
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q3 <- ggplot(dados_covid19, aes(x = state, y = accumCases, fill = state)) +
+  geom_col() +
+  labs(title = "Casos acumulados de COVID-19 por estado")
+
+q3 +
+  transition_states(date, transition_length = 2, state_length = 1) +
+  enter_fade() +
+  exit_fade()
+
+```
+
+## Questão 4
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+estados <- read_state(year = 2019)
+dados_covid19q4 <- filter(dados_covid19, date == "2021-05-27")
+mapaUF <- estados |> 
+  inner_join(dados_covid19q4, c("abbrev_state" = "state"))
+
+pal <- colorBin("Blues", domain = log2(mapaUF$accumDeaths + 1), bins = 5)
+
+leaflet(data = estados) |> 
+  addPolygons(
+    fillColor = ~pal(log2(mapaUF$accumDeaths + 1)),
+    fillOpacity = 1,
+    color = "white
+    ",
+    layerId = ~name_state,
+    weight = 1,
+    popup = paste(
+      mapaUF$name_state, "<br>",
+      "Total de óbitos: ", mapaUF$accumDeaths
+    )
+  ) |> 
+  addLegend(
+    "bottomright",
+    pal = pal,
+    values = ~log2(mapaUF$accumDeaths + 1),
+    title = "Escala",
+    opacity = 1,
+    labFormat = labelFormat(
+      transform = function(x) 2^x - 1,
+      digits = 1
+    )
+  ) |> 
+  addControl("Clique no mapa para ver detalhes", position = "topright")
+
+```
+
+## Questão 5
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+dados_covid19q5 <- filter(dados_covid19,
+between(date,left = as_date("2021-01-01"), right = as_date("2021-06-30")) )
+
+transp <- input_checkbox(
+  label = "Pontos semi-transparentes",
+  map = function(val) ifelse(val, 0.3, 1)
+)
+
+combcores <- input_checkboxgroup(
+  choices = c("Red" = "r", "Green" = "g", "Blue" = "b"),
+  label = "Cor dos pontos",
+  map = function(val) {
+    rgb(0.8 * ("r" %in% val), 0.8 * ("g" %in% val), 0.8 * ("b" %in% val))
+  }
+)
+
+dados_covid19q5 |> 
+  ggvis(~date, ~newDeaths) |> 
+  layer_points(opacity := transp, fill := combcores)
+
+```
+
+```{r}
+var <- input_radiobuttons(
+  label = "Variável",
+  choices = c("newCases", "newDeaths"),
+  map = as.name
+)
+
+p <- ggvis(dados_covid19, y = var)
+layer_points(p, x = ~date, fill := combcores)
+
+```
+
+
+## Questão 6
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q6_A <- plot_ly(iris, x = ~Sepal.Length, y = ~Petal.Length, text = ~Species,
+               type = 'scatter', mode = 'markers', marker = list(opacity = 0.5))
+q6_A <- q6_A |> layout(title = 'Tamanho da sepala e da petala')
+q6_A
+
+```
+
+## Questão 7
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+ggplot(dados_covid19, aes(date, newCases, color = state)) +
+  geom_line() +
+  facet_wrap(~ region, nrow = 2, ncol = 3) +
+  theme(legend.position = "none")
+
+```

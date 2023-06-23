@@ -1,0 +1,239 @@
+---
+title: "Lista de Exercícios 8"
+author: "Wellington Santos Souza (2019012213)"
+output:
+  html_document:
+    df_print: paged
+---
+
+<!-- EDITE AS INFORMAÇÕES ACIMA -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercícios
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# ---===---===---===---===---===---===
+## Carregando todos os pacotes - NÃO coloque código para instalação de pacotes
+
+
+```
+
+
+## Questão 1
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+fq1 <- function(x) {
+  x*(1-x)*exp(x)
+}
+res1 <- optim(par = 2, fq1, control = list(fnscale = -1))
+res1
+```
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+plot(fq1)
+abline(v=res1$par, col = 2)
+points(res1$par, res1$value, col = "blue", pch = 19)
+```
+
+## Questão 2
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+fq2 <- function(x) {
+  x1 = x[1]
+  x2 = x[2]
+  x1^2 + 3*x2^2
+}
+
+res2 <- optim(c(0,1), fq2)
+res2
+```
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+x1 = x2 = seq(-2.5, 2.5, by=0.1)
+y = outer(x1,x2)
+contour(x1, x2, y, col="gray", nlevels = 200, xlim=c(0, 2), ylim=c(0, 2))
+points(res2$par[1], res2$par[2], col=2)
+```
+## Questão 3
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+fq3 <- function(x){
+  2*(x^3)-4*x
+}
+
+root1 <- uniroot(fq3, c(-2,-1))$root
+root2 <- uniroot(fq3, c(-1,1))$root
+root3 <- uniroot(fq3, c(1,2))$root
+
+c(root1, root2, root3)
+```
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+curve(fq3, from=-2, to=2)
+abline(h=0)
+points(c(root1, root2, root3), rep(0,3), col="red", pch=19)
+```
+
+## Questão 4
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+f <- function(x,y) {
+  10 * sin(sqrt(x^2 + y^2)) / sqrt(x^2 + y^2)
+}
+
+x <- seq(-10, 10, length= 30)
+y <- x
+z <- outer(x, y, f)
+persp(x, y, z, col = "lightblue", shade = 0.5,
+      ticktype = "detailed", xlab = "x", ylab = "y", zlab = "z")
+
+fq4 <- function(x) {
+  10 * sin(sqrt(x[1]^2 + x[2]^2)) / sqrt(x[1]^2 + x[2]^2)
+}
+# ponto máximo
+res41 <- optim(c(0,1), fq4)
+res4$par
+# ponto minimo
+res42 <- optim(c(0,1), fq4, control = list(fnscale = -1))
+res42$par
+
+
+points(res41$par[1], res41$par[2], col="red", pch=19)
+points(res42$par[1], res42$par[2], col="blue", pch=19)
+```
+## Questão 5
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q5 <- c(9.5, 10.8, 9.3, 10.7, 10.9, 10.5, 10.7, 9.0, 11.0, 8.4, 10.9, 9.8, 11.4, 10.6, 9.2, 9.7, 8.3, 10.8, 9.8, 9.0)
+
+res51 <- t.test(q5, conf.level = 0.85)
+res51
+res52 <- t.test(x, mu = 9.5, conf.level = 0.90)
+res52
+```
+
+## Questão 6
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+M1 <- c(145, 127, 136, 142, 141, 137)
+M2 <- c(143, 128, 132, 138, 142, 132)
+
+res61 <- var.test(M1,M2)
+res61
+res62 <- t.test(M1, M2, conf.level = 0.95, var.equal = TRUE)
+res62
+```
+
+## Questão 7
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+A <- c(53, 170, 5, 113, 474, 67, 108, 97, 196, 163, 19, 44, 6, 167, 141,
+       12, 11, 66, 357, 48, 88, 23, 14, 64, 37, 217, 272, 28, 21,
+       76, 14, 68, 58, 351, 47, 8, 285, 98, 22,142 ,77 ,187 ,25 ,48,
+       6 ,178 ,52 ,155 ,151 ,13)
+
+B <- c(21.44, 37.55, 24.93, 31.06, 21.97, 20.57, 11.98, 33.93, 30.03, 21.03,
+       32.37,27.87,35.67, 30.01, 27.25, 34.01, 18.32, 24.78, 35.51, 21.13, 21.38,
+       48.58,11.35, 31.33,29.57, 20.05, 23.09, 25.28, 25.78, 49.42, 18.24, 20.81,
+       44.87, 33.76, 27.55, 15.60,43.96, 28.57, 23.82, 24.29, 43.15, 35.10, 38.47,
+       14.63, 15.77, 24.79, 37.77, 37.42,22.61, 56.14, 38.62, 25.80, 30.06, 27.32,
+       25.64, 43.33, 29.56, 29.83, 10.18, 16.06,35.57, 27.98, 38.73, 28.60, 51.41,
+       29.00, 17.85, 22.01, 20.69, 40.30, 37.06, 24.43,29.35, 20.07, 34.06, 38.65,
+       39.41, 47.64, 42.12, 22.47, 42.51, 11.43, 33.28, 44.79,10.84, 43.06, 36.71,
+       20.72,25.51, 20.11, 20.16, 36.74, 44.82, 33.21, 14.87, 27.68,30.30, 24.93,
+       23.65, 26.21 )
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+hist(A, freq = FALSE, main = "Histograma - Conjunto A")
+mu <- mean(A)
+sigma <- sd(A)
+x <- seq(min(A), max(A), length = 100)
+y <- dnorm(x, mean = mu, sd = sigma)
+lines(x, y, col = "red", lwd = 2)
+qqnorm(A)
+qqline(A, col = "blue")
+
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+hist(B, freq = FALSE, main = "Histograma - Conjunto A")
+mu <- mean(B)
+sigma <- sd(B)
+x <- seq(min(B), max(B), length = 100)
+y <- dnorm(x, mean = mu, sd = sigma)
+lines(x, y, col = "red", lwd = 2)
+qqnorm(B)
+qqline(B, col = "blue")
+
+```
+## Questão 8
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Tabela de contingência
+olhos_pelo <- matrix(c(244, 82, 80, 12), nrow = 2, byrow = TRUE)
+colnames(olhos_pelo) <- c("Normais", "Reduzidos")
+rownames(olhos_pelo) <- c("Normais", "Reduzidos")
+olhos_pelo <- as.table(olhos_pelo)
+olhos_pelo
+```
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Teste qui-quadrado de independência
+res8 <- chisq.test(olhos_pelo)
+# Valor-p do teste
+p_value <- res8$p.value
+
+# Comparar o valor-p com o nível de significância
+if (p_value < 0.05) {
+  conclusao = "Há evidências de associação entre o tipo de olho e o tipo de pelo."
+} else {
+  conclusao = "Não há evidências de associação entre o tipo de olho e o tipo de pelo."
+}
+
+# Imprimir o resultado
+cat("Resultado do teste qui-quadrado:\n")
+print(res8)
+cat("\nConclusão:", conclusao)
+
+```
+
+## Questão 9
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Frequências observadas
+observadas <- c(315, 108, 101, 32)
+nomes_fenotipos <- c("Amarelas lisas", "Verdes lisas", "Amarelas rugosas", "Verdes rugosas")
+tabela <- matrix(observadas, nrow = 1, byrow = TRUE)
+colnames(tabela) <- nomes_fenotipos
+tabela <- as.table(tabela)
+tabela
+```
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Proporções esperadas
+esperadas <- c(9/16, 3/16, 3/16, 1/16) * sum(observadas)
+esperadas
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Teste qui-quadrado de adequação
+res9 <- chisq.test(tabela, p = c(9/16, 3/16, 3/16, 1/16))
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Valor-p do teste
+p_value <- res9$p.value
+
+# Comparar o valor-p com o nível de significância
+if (p_value < 0.05) {
+  conclusao <- "A Teoria Mendeliana não é adequada para descrever as frequências dos fenótipos."
+} else {
+  conclusao <- "A Teoria Mendeliana é adequada para descrever as frequências dos fenótipos."
+}
+
+# Imprimir o resultado
+cat("Resultado do teste qui-quadrado de adequação:\n")
+print(res9)
+cat("\nConclusão:", conclusao)
+
+```
+

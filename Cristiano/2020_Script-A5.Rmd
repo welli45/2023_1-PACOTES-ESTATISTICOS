@@ -1,0 +1,270 @@
+---
+title: "Aula sobre o Rmarkdown"
+author: "Cristiano de Carvalho Santos"
+date: "Departamento de Estatística, UFMG"
+output: 
+  slidy_presentation: 
+    highlight: haddock
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Introdução
+
+Este é um documento R Markdown. 
+Markdown é uma sintaxe de formatação simples para criação de documentos HTML, PDF e MS Word.  Para mais detalhes sobre o uso do R Markdown veja <http://rmarkdown.rstudio.com>. \vspace{0.9cm}
+
+\
+
+Com o Rmarkdown podemos fazer:
+
+- Apresentações
+- Relatórios
+- Dashboard
+- Etc
+- <https://rmarkdown.rstudio.com/gallery.html>
+
+\
+
+Muita coisa pode ser encontrada em:
+
++ <https://bookdown.org/yihui/rmarkdown/html-document.html>
+
+# 
+
+Quando você clica no botão **Knit** um documento será gerado, incluíndo a saída  de qualquer pedaço de código R. Você pode incorporar um pedaço de código R assim:
+
+```{r}
+summary(cars)
+```
+ou 
+```{r echo=TRUE, fig.height=3, fig.width=3, fig.align = "center"}
+par(mar=c(5,5,1,0))
+plot(pressure)
+```
+
+# Como criar um arquivo do Rmarkdown
+Após abrir o <span style="color:red">RStudio</span>, basta ir em: 
+
+1. File > New File > R Markdown.
+2. Escolher o tipo de documento, o formato do output e preencher título e autor.
+3. Um exemplo será criado automaticamente com alguns comandos básicos.
+4. Após salvar, o documento pode ser gerado utilizando o botão Knit.
+5. Algumas configurações podem ser alteradas na engrenagem ao lado do knit.
+
+
+#
+
+O texto pode ser digitado diretamente, mas para inserir código do R é necessário ir em:
+
+1. Opção Insert 
+2. Escolher as configurações desejadas. É possível:
+    + Exibir código e resultado
+    + Exibir apenas um deles
+    + Exibir código e não rodar
+    + Rodar código sem exibir resultados
+    + Incluir gráficos ajustando o tamanho
+  
+  \
+  \
+  
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Use message= FALSE, warning = FALSE para não imprimir mensagens que o r solta no console
+# coloque algo assim ```{r echo=TRUE, message=FALSE, warning=FALSE}
+```    
+    
+# Cabeçalhos
+## Título 2
+### Título 3
+
+
+Para definir seções e subseções em um relatório podemos utilizar `#`. Os títulos acima são obtidos com
+
+`#` Cabeçalhos
+
+`##` Título 2
+
+`###` Título 3
+
+
+Em uma apresentação, as seções definem os slides. Por exemplo, se quer mudar de slide e nao definir uma nova seção basta colocar `#` em uma linha sem acrescentar nenhum texto na mesma linha.
+
+\
+\
+
+Linha em branco para aumentar o espaçamento vertical podem ser incluidas com o comando `\`
+
+
+# Listas
+
+- Use um sinal de menos `-` para um marcador
++ Ou o sinal de mais `+`
+* Ou um asterisco `*`
+
+Para lista numerada use `1.` e para sublista basta dar mais espaços
+
+1. Relaciona um item na lista:
+    - Recuo de quatro espaços.
+        - recuo de oito espaços.
+
+
+# Figuras
+
+
+Para obter uma figura que utilize toda a largura da página basta acrescentar a opção `fig.fullwidth = TRUE` e podemos acrescentar título com `fig.cap = "Figura 1: Full width figure"`.
+
+```{r, fig.width = 10, fig.height = 4, fig.fullwidth = TRUE, fig.cap = "Figura 1: Full width figure"}
+plot(cars)
+```
+
+
+
+# Equações 
+
+Você pode incluir equações em linguagem \LaTeX\. Por exemplo:
+
+
+$$\frac{d}{dx}\left( \int_{0}^{x} f(u)\,du\right)=f(x).$$
+ é gerado com 
+ `$$\frac{d}{dx}\left( \int_{0}^{x} f(u)\,du\right)=f(x).$$`
+ 
+
+ou 
+
+`\begin{equation}`
+
+`\frac{d}{dx}\left( \int_{0}^{x} f(u)\,du\right)=f(x).`
+
+`\end{equation}`
+
+\
+
+Mais exemplos em: 
+
+  - <http://www.montana.edu/rotella/documents/502/MarkdownEqnExamples.Rmd>
+  - Pesquise no Google algo do tipo: <span style="color:green">equations rmarkdown</span>
+
+
+# Tabelas
+
+	
+Digitando toda a tabela podemos fazer 
+
+`| Tables        | Are           |  Cool  |`
+
+`| ------------- |:-------------:| ------:|`
+
+`| col 3 is      | right-aligned |   1600 |`
+
+`| col 2 is      | centered      |     12 |`
+
+`| zebra stripes | are neat      |      1 |`
+
+\
+\
+
+
+| Tables        | Are           |  Cool  |
+| ------------- |:-------------:| ------:|
+| col 3 is      | right-aligned |   1600 |
+| col 2 is      | centered      |     12 |
+| zebra stripes | are neat      |      1 |
+
+\
+
+
+**Obs:** O aspecto da tabela muda para cada tipo de documento a ser criado. 
+
+
+
+
+# Com o pacote knitr
+```{r kable1, echo=TRUE,  warning=FALSE}
+# Com o kable
+n <- 100
+x <- rnorm(n)
+y <- 2*x + rnorm(n)
+out <- lm(y ~ x)
+#Necessario instalar o pacote antes!!!
+library(knitr)
+kable(summary(out)$coef, digits=2, format = "markdown")
+```
+
+#
+```{r kable2, echo=TRUE,  warning=FALSE}
+# Vejam o help da função kable
+x = matrix(rnorm(40), 5)
+dimnames(x) = list(head(c("G1","G2","G3","G4","G5")), head(LETTERS, ncol(x)))
+knitr::kable(x, digits = 2, caption = "Montando uma tabela a partir de uma matriz.")
+```
+
+#
+```{r kable3, echo=TRUE,  warning=FALSE}
+x1 = sample(letters[1:3], 1000, TRUE)
+x2 = sample(letters[1:3], 1000, TRUE)
+x3 = sample(letters[1:3], 1000, TRUE)
+tab =table(x1, x2)
+knitr::kable(tab, digits = 2, caption = "Também é possível com o table")
+```
+
+
+
+# Utilizando o Pander
+```{r pander, echo=TRUE}
+# Com o pander
+x = matrix(rnorm(40), 5)
+dimnames(x) = list(NULL, head(LETTERS, ncol(x)))
+library(pander)
+panderOptions("digits", 2)
+pander(x)
+```
+
+
+# Alguns detalhes de formatação
+
+ - `_italico_` gera  _italico_
+ - `**negrito**` gera  **negrito**
+ - `*italico*` gera  *italico*
+ - `__negrito__` gera  __negrito__
+ - `***italico e negrito***` gera  ***italico e negrito***
+
+# Dashboards
+
+Alguns exemplos de Dashboards em:
+
+- <https://rmarkdown.rstudio.com/flexdashboard/>
+
+\
+
+Como fazer?
+
+1. Instale o pacote "flexdashboard"
+2. File > New File > R Markdown
+3. Escolha FROM TEMPLATE e Flex Dashboard
+3. Um exemplo será criado automaticamente com alguns comandos básicos
+
+Outra opção é obter o código de um dashboard pronto e editar de acordo com os seus objetivos
+
+# Alguns sites que podem ser úteis
+
+\
+
+
+- <https://bookdown.org/yihui/rmarkdown/>
+- <https://rmarkdown.rstudio.com/authoring_quick_tour.html#rendering_output>
+- <https://rawgit.com/marcosvital/CantinhodoR/master/tutoriais%20em%20html/Tutorial_de_RMarkdown.html>
+- <http://www.jacolienvanrij.com/Tutorials/tutorialMarkdown.html>
+- <http://miror-ejd.eu/wp-content/uploads/sites/34/2016/10/Introduction-to-Markdown-1.pdf>
+- <https://rmarkdown.rstudio.com/gallery.html>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,145 @@
+---
+title: "Lista de Exercícios 09"
+author: "Wellington S. Souza (2019012213)"
+output:
+  html_document:
+    df_print: paged
+---
+
+<!-- EDITE AS INFORMAÇÕES ACIMA -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+
+# Exercícios
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(tidyverse)
+library(aplore3)
+library(ggforce)
+library(esquisse)
+```
+
+## Questão 1
+
+### A
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q1 <- ggplot(data = icu)+ 
+  geom_point(
+    mapping = aes(x = age, y = sys, color = race, shape = gender)
+  )
+```
+
+### B
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q1 + theme(legend.position = "top")+
+  labs(color = "Raça", shape = "Gênero")
+```
+### C
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q1 + theme(legend.position = "top")+
+  labs(color = "Raça", shape = "Gênero")+
+  facet_zoom(x = race == "Black")
+```
+
+## Questão 2
+
+### Gráfico 1
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q2 <- ggplot(data = icu, mapping = aes(x = age))+
+  geom_bar(color = "blue")
+
+q2 + facet_grid(race ~ sta)
+
+```
+
+### Gráfico 2
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q2 + facet_wrap(race ~ sta, ncol = 2)
+```
+
+## Questão 3
+
+### A
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q3 <- ggplot(data = icu, mapping = aes(x = sys, y = race,shape = gender, color = ser))
+  
+
+q3 + 
+  geom_boxplot()+
+  geom_jitter(width = 0.2)
+```
+
+### B
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+q3 + 
+  geom_boxplot()+
+  stat_summary(geom = "point", fun.y = "mean", colour = "red", size = 3)
+```
+
+## Questão 4
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+ggplot(data = icu)+
+  geom_bar(mapping = aes(x = loc), fill = "blue")
+```
+
+## Questão 5
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# icu |> esquisser()
+icu |> 
+ ggplot() +
+  aes(x = age, y = race) +
+  geom_violin(adjust = 1L, scale = "area", fill = "#841479") +
+  labs(title = "Gráfico de Violino") +
+  theme_minimal() 
+```
+
+## Questão 6
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Valores para o eixo x
+x <- seq(0, 10, 0.01)
+
+# Calculando a densidade de probabilidade da distribuição Gamma
+densidade <- dgamma(x, 2, 5)
+
+# Criando o gráfico
+ggplot() +
+  geom_line(aes(x, densidade), color = "blue", size = 1) +
+  labs(x = "Valores", y = "Densidade de Probabilidade") +
+  ggtitle("Distribuição Gamma") +
+  theme_minimal()
+```
+
+## Questão 7
+
+O problema com o código fornecido é que você está passando a string "blue" diretamente como o valor da estética color, em vez de usar o nome de uma variável ou valor categórico.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
+```
+
+
+
+## Questão 8
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+## Questão 9
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+## Questão 10
+
+**`geom_col()` cria gráficos de colunas (barras) com alturas pré-definidas, enquanto `geom_bar()` calcula automaticamente as alturas das barras com base nas frequências ou contagens das categorias.**
+

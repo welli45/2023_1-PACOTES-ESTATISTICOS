@@ -1,0 +1,163 @@
+---
+title: "Lista de Exercícios 10"
+author: "Autor 1 (matricula) e autor 2 (matricula)"
+output:
+  html_document:
+    df_print: paged
+---
+
+<!-- EDITE AS INFORMAÇÕES ACIMA -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Exercícios
+
++ Utilize funções do pacote tidyverse sempre que possível!
+
++ Faça com os dados sobre desenvolvimento sustentável das cidades no site https://idsc-br.sdgindex.org/
+
++ Se interessar pelo assunto, leia as informações no site para saber mais.
+
++ Abra os dados no excel ou similar, e renomeie os nomes das planilhas retirando os acentos
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(tidyverse)
+library(readxl)
+library(brazilmaps)
+library(RColorBrewer)
+library(sf)
+```
+
+
+## Questão 1
+Usando o botão ``import Dataset`` do RStudio, importe para a planilha ``Indices``. Salve o conjuto de dados como um objeto tibble. Forneça os códigos para isto. 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+dados <- read_excel("Base de Dados.xlsx", 
+    sheet = "Indice") %>% as_tibble()
+head(dados)
+```
+
+## Questão 2
+Utilizando a função select, selecione apenas as variáveis: id, Municipio, Pontuação, UF, População2019 e todas as pontuações ODS. Utilize a função ``contains``. 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# colnames(dados)
+dadosQ2 <- dados %>%  
+  select(id, Município, Pontuação, UF, População_2019, contains("Pontuação"))
+head(dadosQ2)
+```
+
+## Questão 3
+Utilizando a função select, exclua as colunas com a palavra regional no nome do banco de dados anterior. 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+dadosQ3 <- dadosQ2 %>% 
+  select(-contains("regional"))
+head(dadosQ3)
+```
+
+## Questão 4
+Renomeie as colunas com nome ``Pontuação ODS número`` para `ODS numero`. 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+dadosQ4 <- dadosQ3 %>% 
+  rename_at(vars(contains("Pontuação ODS")), ~str_replace(.,"Pontuação ODS", "ODS"))
+head(dadosQ4)
+```
+
+## Questão 5
+Utilize a função filter para filtrar os dados anteriores obtendo os dados apenas de Minas Gerais.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+dadosQ5 <- dadosQ4 %>% 
+  filter(UF == "MG")
+head(dadosQ5)
+```
+
+## Questão 6
+Ordene os dados em ordem decrescendo da pontuação no ODS1.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+dadosQ6 <- dadosQ5 %>% 
+  arrange(desc(ODS1))
+head(dadosQ6)
+```
+
+## Questão 7
+Usando o pacote geobr ou o pacote brazilmaps, obtenha as coordenadas geográficas dos municipios de Minas Gerais. 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+cord_MG <- get_brmap("City") %>%
+  filter(State == 31)
+
+head(cord_MG)
+```
+
+## Questão 8
+Faça a junção dos bancos de dados das coordenadas dos Municípios de Minas Gerais e dos índices de desenvolvimento sustentável. Note que os dados de desenvolvimento não englobam todos os municípios do estado. Utilize uma função que mantém as coordenadas mesmo para os municípios que não aparecem nos dados de desenvolvimento. Use o código do município como chave.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+dadosQ8 <- cord_MG %>% 
+  left_join(dadosQ6, by = c(City = "id"))
+head(dadosQ8)
+```
+
+## Questão 9
+Faça o mapa do estado mostrando a variável ODS1 na escala. Note que a maior parte dos municípios do estado ficarão na cor cinza pois não tem dados sobre o desenvolvimento sustentável.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.align="center"}
+ggplot(dadosQ8, aes(fill = ODS1)) +
+           scale_fill_gradientn(colours = brewer.pal(n=9,name="YlOrRd")) +
+          geom_sf()
+```
+
+
+## Questão 10
+Rafaça o mapa do item anterior para outro estado e apresentados os resultados de outro indíce de sua escolha. 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.align="center"}
+cord_BA <- get_brmap("City") %>%
+  filter(State == 29)
+
+dadosQ10 <- dadosQ4 %>% 
+  filter(UF == "BA")
+
+dadosQ10.1 <- cord_BA %>% 
+  left_join(dadosQ10, by = c(City = "id"))
+
+ggplot(dadosQ10.1, aes(fill = ODS2)) +
+           scale_fill_gradientn(colours = brewer.pal(n=9,name="YlOrRd")) +
+          geom_sf()
+```
+
+## Questão 11
+Utilizando o banco de dados da questão 3, construa um banco de dados com a pontuação média por estado e ordene em ordem decrescente.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+dadosQ11 <- dadosQ3 %>% 
+  group_by(UF) %>% 
+  summarise("Pontuação Média" = mean(Pontuação)) %>% 
+  arrange(desc("Pontuação Média"))
+head(dadosQ11)
+```
+
+## Questão 12
+Repita o item anterior calculando a média ponderada pelo tamanho da população de cada município. Utilize a função ``weighted.mean``.
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+dadosQ12 <- dadosQ3 %>% 
+  group_by(UF) %>% 
+  summarise("Pontuação Média" = weighted.mean(Pontuação, População_2019)) %>% 
+  arrange(desc("Pontuação Média"))
+head(dadosQ12)
+```
+
+
+
+

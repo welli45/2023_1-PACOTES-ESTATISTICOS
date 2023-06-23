@@ -1,0 +1,189 @@
+---
+title: "Lista de Exercícios 7"
+author: "Wellington Santos Souza (2019012213)"
+output:
+  html_document:
+    df_print: paged
+---
+
+<!-- EDITE AS INFORMAÇÕES ACIMA -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Exercícios
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(microbenchmark)
+```
+
+## Questão 1
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+meu_max <- function(x) {
+  n <- length(x)
+  maximo <- x[1]
+  i <- 2
+  while(i <= n) {
+    if (x[i] > maximo) {
+      maximo <- x[i]
+    }
+    i <- i + 1
+  }
+  return(maximo)
+}
+vetor <- runif(1000000)
+
+# medindo o tempo da função "meu_max"
+mb_meu_max <- microbenchmark(
+  meu_max(vetor),
+  times = 10
+)
+
+# medindo o tempo da função "max"
+mb_max <- microbenchmark(
+  max(vetor),
+  times = 10
+)
+```
+
+```{r}
+# imprimindo os resultados
+print(mb_meu_max)
+```
+
+```{r}
+print(mb_max)
+```
+
+## Questão 2
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# função para gerar números aleatórios entre 2 e 12
+gerar_numero <- function() {
+  return(sample(2:12, 1))
+}
+
+contador <- 0
+
+# loop while para o jogo de multiplicação
+while (contador < 5) {
+  num1 <- gerar_numero()
+  num2 <- gerar_numero()
+  
+  cat("Quanto é", num1, "vezes", num2, "? ")
+  resposta <- as.integer(readline())
+  
+  if (resposta == num1 * num2) {
+    cat("Parabéns, você acertou!\n")
+    contador <- contador + 1
+  } else {
+    cat("Ops, você errou. Tente novamente.\n")
+  }
+}
+
+# mensagem final
+cat("Parabéns, você acertou cinco respostas!\n")
+```
+
+## Questão 3
+
+## A
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+amostra_A <- function(n){
+  amostra <- numeric(n)
+  for (i in 1:n) {
+    x <- runif(1)
+    if (x <= 0.2){
+      y <- 1
+    } else if (x <= 0.7){
+      y <- 2
+    } else {
+      y <- 3
+    }
+    amostra[i] <- y
+  }
+  return(amostra)
+}
+amostra_A(30)
+
+```
+
+## B
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+amostra_B <- function(n) {
+  valores <- c(1, 2, 3)
+  probabilidades <- c(0.2, 0.5, 0.3)
+  amostra <- sample(valores, size = n, replace = TRUE, prob = probabilidades)
+  return(amostra)
+}
+
+amostra_B(4)
+```
+## C
+```{r}
+amostra <- amostra_B(100)
+
+# Criar gráfico de barras com frequência absoluta
+barplot(table(amostra), main = "Frequência absoluta da amostra de Y", 
+        xlab = "Y", ylab = "Frequência absoluta")
+
+```
+## D
+```{r}
+ref_amostra_b <- function(n, valores, probabilidades) {
+  amostra <- sample(valores, size = n, replace = TRUE, prob = probabilidades)
+  return(amostra)
+}
+
+valores <- c(1, 2, 3)
+probabilidades <- c(0.2, 0.5, 0.3)
+ref_amostra_b(100, valores, probabilidades)
+```
+
+## Questão 4
+
+## A
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+gerar_amostra_exp <- function(n, lambda) {
+  x <- runif(n)
+  y <- -log(x)/lambda
+  return(y)
+}
+gerar_amostra_exp(12,2)
+```
+## B
+```{r}
+amostra <- gerar_amostra_exp(n = 10000, lambda = 5)
+proporcao <- sum(amostra > 0.5) / length(amostra)
+cat("Aproximação da probabilidade P(Y > 0.5):", proporcao)
+```
+## C
+```{r}
+f <- function(y, lambda) lambda * exp(-lambda * y)
+
+prob <- integrate(f, lower = 0.5, upper = Inf, lambda = 5)$value
+
+cat("Probabilidade P(Y > 0.5) =", prob)
+```
+
+## Questão 5
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+```
+
+## Questão 6
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+## Questão 7
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```

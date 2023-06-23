@@ -1,0 +1,149 @@
+---
+title: "Relatório - modelo de solução lista 5"
+author: "Cristiano de Carvalho Santos"
+date: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Enunciado
+
+<span style="color: blue;">
+Faça um relatório, uma apresentação ou um Dashboard considerando a questão 3 da lista de exercícios 4. Diferentemente da questão 3, considere duas situações na geração dos dados: Gerando da própria normal como descrito na questão e gerando de outra distribuição de sua escolha. Note ao escolher outra distribuição, o cálculo da média populacional $\mu$ e do desvio padrão populacional $\sigma$ irão depender da distribuição escolhida, por exemplo, no caso da Poisson($\lambda$) temos $\mu = E[X] = \lambda$ e $\sigma^2 = Var[X]= \lambda$ (Esta vetado o uso da Poisson!). Faça com 3 tamanhos amostrais: $n$=10, 30 e 100.</span>
+
+\
+\
+
+### Introdução  
+
+A proposta é através de um estudo de simulação Monte Carlo estimar a probabilidade de cobertura do intervalo de confiança com variância populacional conhecida. 
+
+Vamos considerar duas situações quanto a distribuição dos dados:
+
++ $X\sim Normal(\mu, \sigma^2)$ em que $E[X]= \mu$ e $Var[X]=\sigma^2$;
+
++ $X\sim Binomial(m, p)$ em que $E[X]= np$ e $Var[X]=mp(1-p)$;
+
+
+\
+
+
+As amostras são geradas com as funções:
+
+- rnorm(n, mean, sd);
+
+- rbinom(n, m, p);
+
+\ 
+
+E os limites do Intervalo de confiança calculados com
+    $$LI = \overline{x} - z_{\alpha/2}\frac{\sigma}{\sqrt{n}}\ \ \ \ \\ \mbox{e} $$
+    $$LS = \overline{x} + z_{\alpha/2}\frac{\sigma}{\sqrt{n}} $$
+    
+O valor de $z_{\alpha/2}$ pode ser obtido no R utilizando o comando -qnorm(0.025,0,1), considerando que o valor de $\alpha$ seja 0.05.
+
+Para um dado tamanho amostral $n$, consideramos as seguintes funções:
+
+```{r}
+## Normal
+int_normal <- function(n, media, variancia, L = 1000){
+  ic <- vector()
+  
+  for(i in 1:L){
+    dados <- rnorm(n, media, sqrt(variancia))
+    
+    LI <- mean(dados) - (qnorm(0.975,0,1))*sqrt(variancia)/sqrt(n)
+    LS <- mean(dados) + (qnorm(0.975,0,1))*sqrt(variancia)/sqrt(n)
+    
+    ic[i] <- ifelse(media >= LI && media <= LS,1,0)
+  }
+  proporcao <- sum(ic)/L
+  return(proporcao)
+}
+
+int_binomial <- function(n, m, p, L = 1000){
+  ## Exemplo: n alunos
+  ## cada aluno faz uma prova com m questões
+  ## em cada questão os alunos tem probabilidade p de acertar
+  ic <- vector()
+  media = m*p
+  variancia = m*p*(1-p)
+  
+  for(i in 1:L){
+    
+    dados <- rbinom(n, m, p)
+    LI <- mean(dados) - (qnorm(0.975,0,1))*sqrt(variancia)/sqrt(n)
+    LS <- mean(dados) + (qnorm(0.975,0,1))*sqrt(variancia)/sqrt(n)
+    
+    ic[i] <- (media >= LI) & (media <= LS)
+  }
+  proporcao <- sum(ic)/L
+  return(proporcao)
+}
+```
+
+
+
+
+\
+\
+
+### Resultados
+
+Aqui os resultados serão apresentando considerando amostras geradas no primeiro cenário da distribuição Normal com média 0 e variância 10, e no segundo cenário, da distribuição binomial com 10 experimentos bernoulli e probabilidade de sucesso de 5%.
+
+
+```{r fig.align="center", fig.height=4, fig.width=8}
+par(mfrow = c(1, 2))
+x = seq(-20, 20, by = 0.1)
+plot(x, dnorm(x, 0, sqrt(10)),
+     type = "l", ylab= "Densidade")
+plot(0:10, dbinom(0:10, 10, 0.05),
+     type = "h", ylab = expression(P(X == x)), xlab="x" )
+```
+Para estas distribuições temos:
+```{r kable2, echo=TRUE,  warning=FALSE}
+library(knitr)
+mat = cbind(c(0,10), c(10*0.05, 10*0.05*0.95))
+rownames(mat)=c("Média", "Variância")
+colnames(mat)=c("Normal(0, 10)", "Binomial(10, 0,05)")
+kable(mat, digits=3, align = "cc",
+      caption = "Média e variância populacionais")
+```
+
+Podemos guardar os resultados da seguinte forma:
+```{r}
+n = c(10, 30, 100)
+result1 = result2 = vector()
+for(i in 1:length(n)){
+  result1[i] = int_normal(n[i], 0, 10, L = 10000)
+  result2[i] = int_binomial(n[i], 10, 0.05, L = 10000)
+}
+```
+
+```{r kable1, echo=TRUE,  warning=FALSE}
+library(knitr)
+mat = cbind(result1, result2)
+rownames(mat)=c("n = 10", "n = 30", "n = 100")
+colnames(mat)=c("Normal(0, 10)", "Binomial(10, 0,05)")
+kable(mat, digits=3, align = "cc",
+      caption = "Proporções de cobertura")
+```
+
+Apresentamos a **probabilidade de cobertura** do intervalo com o gráfico abaixo:
+
+```{r fig.align="center", fig.height=4, fig.width=5}
+plot(n, result1, type = "b", ylim=c(0.92,0.98) , pch=16, lwd=2, lty=2,
+     ylab = "Probabilidade de cobertura")
+lines(n, result2, col= 2, lwd=2, lty =2)
+abline(h=0.95,lty=3,col="gray", lwd=2)
+points(n, result2, pch=16, col = 2)
+legend(60,0.94,c("Normal", "Binomial"), col=c(1,2), lwd=2, bty="n")
+```
+
+
+
+

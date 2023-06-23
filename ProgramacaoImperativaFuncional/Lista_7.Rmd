@@ -1,0 +1,125 @@
+---
+title: "Lista de Exercícios 7"
+author: "Wellington Santos (2019012213)"
+output:
+  html_document:
+    df_print: paged
+---
+
+<!-- EDITE AS INFORMAÇÕES ACIMA -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Exercícios
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(tidyverse)
+```
+
+## Questão 1
+
+Crie uma função que encontre o máximo de um vetor (use `while` na sua função). Compare os resultados e a performance de sua implementação com a função `max()` do R. Sua função é quantas vezes mais lenta?
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# maximo <- 
+
+i = 1
+x = 1:5
+
+while (i <= length(x)) {
+  i = i 
+  print(i)
+}
+
+system.time()
+
+```
+
+## Questão 2
+
+Implemente um jogo de multiplicação. Um `loop while` que dá ao usuário dois números aleatórios inteiros de 2 a 12 e pede ao usuário que os multiplique. Apenas saia do loop após cinco respostas corretas. Use `as.integer(readline())` para ler a resposta do usuário e função `cat` para imprimir mensagens para o usuário. Exemplo:
+
+`cat("Digite no console o resultado do produto dos dois números e aperte enter.\n")`
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+## Questão 3
+
+Considere a variável aleatória $Y$ com a seguinte distribuição de probabilidade
+
+| Y        | 1   | 2   | 3   |
+|----------|-----|-----|-----|
+| P(Y = y) | 0.2 | 0.5 | 0.3 |
+
+É possível gerar um valor desta distribuição de probabilidade inicialmente gerando um valor X de uma distribuição Uniforme(0,1). Se $X \le 0,2$ então $Y = 1$, se $0,2 < X \ge 0,7$ então $Y = 2$, se $X > 0,7$ então $Y = 3$.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+
+```
+
+## Questão 4
+
+Se $X \sim Uniforme(0, 1)$ então $Y = −ln {X}/ \lambda$ tem distribuição Exponencial com parâmetro $\lambda$. (Não use as funções rexp, dexp, pexp e qexp)
+
+a = Faça uma função que gere uma amostra de tamanho n da distribuição Exponencial com parâmetro λ ao gerar da distribuição uniforme e calcular a transformação acima. A função deve ter dois argumentos (n e λ) e retornar um vetor.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+b = Gere uma amostra de tamanho 10000 da distribuição Exponencial com parâmetro $\lambda = 5$ e obtenha uma aproximação da probabilidade $P(Y > 0, 5)$, isto é, a proporção de valores gerados maiores do que 0,5.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+c = A distribuição Exponencial possui função densidade de probabilidade dada por $f(y) = \lambda exp {−λy}$. Utilize integração numérica no R (função integrate) para calcular $P(Y > 0,5)$.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+## Questão 5
+
+Usando apenas funções do pacote purrr (sem usar ) nos itens b) até d), resolva os seguintes itens:
+
+a = Crie uma função, com argumentos $n,\mu ~e~ \sigma$, que gere uma amostra de tamanho n da distribuição normal com parâmetros da média $\mu$ e desvio padrão $\sigma$, calcule LI e LS como descrito abaixo e retorne 1 caso $LI\le \mu \ge LS$ seja verdadeiro ou 0 caso contrário. Os limites são obtidos por:
+
+$$
+LI=\overline{x} - z_{a/2}\frac{\sigma}{\sqrt{n}} \\
+LS=\overline{x} + z_{a/2}\frac{\sigma}{\sqrt{n}}
+$$
+O valor de $z_{a/2}$ pode ser obtido no R utilizando o comando qnorm e sabendo que $P(Z > z_{a/2}) = 0,025$ ao considerar que o valor de α seja 0,05.
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+b = Faça uma função que repete o uso da função anterior 10000 vezes e que receba como argumentos os valores de $n, \mu ~e~ \sigma$. Você deverá retornar a proporção de intervalos que contém μ, ou seja, de valores 1 obtidos. Teste sua função do item anterior para valores de $n, \mu ~e~\sigma^2$ de sua preferência.
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+## Questão 6
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```
+
+## Questão 7
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+## Insira seu código
+```

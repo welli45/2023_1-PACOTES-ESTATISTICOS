@@ -1,0 +1,400 @@
+---
+title: "Trabalho 1 - Pacotes Estatísticos"
+author: "Isabela Canuto Paiva e Wellington Santos Souza"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+---
+
+<!-- EDITE AS INFORMAÇÕES ACIMA -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T,
+results = "hide")
+
+```
+
+# Introdução
+
+Neste trabalho, iremos desenvolver uma função no software R que realizará o teste t de Student para a média populacional com variância desconhecida. Em seguida, aplicaremos esse teste em diversas distribuições, com tamanhos diferentes, a fim de analisar o desempenho do teste e comparar as taxas de acerto obtidas para essas diferentes situações.
+
+O teste t de Student é uma ferramenta estatística amplamente utilizada para determinar se há diferença significativa entre as médias de duas amostras independentes. Ele leva em consideração a média, o tamanho da amostra e a variabilidade dos dados para calcular uma estatística de teste que é comparada a uma distribuição t de Student.
+
+Neste estudo, exploraremos o comportamento do teste t de Student em relação a diferentes distribuições de dados e tamanhos de amostra. Ao aplicar o teste em diversas distribuições, poderemos observar como ele se comporta em cenários variados, desde distribuições aproximadamente normais até distribuições assimétricas.
+
+Além disso, ao analisar as taxas de acerto do teste para diferentes tamanhos de amostra, poderemos investigar como a precisão do teste é afetada pelo número de observações disponíveis. Essa análise nos permitirá compreender melhor os limites e as condições em que o teste t de Student é mais eficaz.
+
+Ao final deste trabalho, teremos uma compreensão mais aprofundada do desempenho do teste t de Student em diferentes situações, o que nos proporcionará insights valiosos para a interpretação adequada dos resultados e a escolha adequada deste teste estatístico em estudos futuros.
+
+# Desenvolvimento Teórico
+
+Para testarmos a média de uma população de variância desconhecida podemos usar o *teste t de Student*, criado por William Sealy Gosset em 1908. Apesar do pressupor a *normalidade dos dados*, o teste é robusto em relação à violação desta suposição quando o tamanho da amostra é grande o suficiente, ou seja, para amostras grandes, a distribuição dos dados tende a se aproximar de uma distribuição normal pelo *teorema do limite central*. Portanto, em muitos casos, mesmo que os dados não sigam uma distribuição perfeitamente normal, o teste t ainda pode ser utilizado de forma adequada. No entanto, se o tamanho da amostra for pequeno e houver evidências claras de que os dados não seguem uma distribuição normal, o teste t de Student pode não ser apropriado.
+
+O teste segue a distribuição t de Student que pode ser dada pela fórmula:
+
+${\displaystyle f(t)={\frac {\Gamma ({\frac {\nu +1}{2}})}{{\sqrt {\nu \pi }}\,\Gamma ({\frac {\nu }{2}})}}\left(1+{\frac {t^{2}}{\nu }}\right)^{{-({\frac {\nu +1}{2}})}}\!}$, onde $\Gamma (n)=(n-1)!$.
+
+Porém, como esta depende do uso de fatorial, que é muito custoso na programação, para este trabalho decidimos usar a função:
+
+${\displaystyle f(t)={\frac {1}{{\sqrt {\nu }}\,B\left({\frac {1}{2}},{\frac {\nu }{2}}\right)}}\left(1+{\frac {t^{2}}{\nu }}\right)^{-({\frac {\nu +1}{2}})}\!}$, onde $\mathrm {\mathrm {B} } (x,y)=\int _{0}^{1}t^{x-1}(1-t)^{y-1}\,dt\!$.
+
+Já a sua estatística de teste é dada por $t={\frac {{\bar {x}}-\mu _{0}}{{\tfrac {s}{{\sqrt {n}}}}}}$ onde ${\bar{x}}$ é a média amostral, $\mu _{0}$ é um valor fixo usado para comparação com a média da amostra, $s$ é o desvio padrão amostral e $n$ é o tamanho da amostra.
+
+# Estudo de simulação
+
+## Construção do Teste de Hipótese
+
+```{r Pacotes, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE }
+## Carregando todos os pacotes
+library(pracma)
+library(latex2exp)
+library(kableExtra)
+library(knitr)
+```
+
+Primeiramente importamos para o R a função $\mathrm {\mathrm {B} } (x,y)=\int _{0}^{1}t^{x-1}(1-t)^{y-1}\,dt\!$:
+
+```{r Beta, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+beta <- function(gl){
+  b <- function(t){
+    f <- ( t ^(-0.5) ) * (1-t)^((gl/2)-1)
+    return(f)
+  }
+  int <- integrate(b, lower = 0, upper = 1)
+  return(int$value)
+}
+```
+
+Agora podemos implementar a função densidade de probabilidade $F(t)$ integrando a função de distribuição:
+
+```{r Densidade, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# P(X=x), quando X~T, dados x e o grau de liberdade
+t_dens <- function(x, gl){
+  t_dist <- function(t){
+    f <- 1 / ( sqrt(gl) * beta(gl) ) * ( (1 + t^2/gl)^(-(gl+1)/2) )
+    return(f)
+  }
+  d <- integrate(t_dist, lower = -Inf, upper = x)
+  return(d$value)
+}
+```
+
+Calculamos a estatística de teste:
+
+```{r T observado, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# T Observado
+tobs <- function(v, mi0) { 
+  f <- (mean(v)-mi0)/(sd(v)/sqrt(length(v)))
+  return(f) 
+}
+```
+
+E finalmente concluímos o teste:
+
+```{r Teste t, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+#Teste
+
+teste <- function(v, mi0, sinal, alfa) {
+  #Calcula o valor p
+  if (sinal == 'menor'){
+    pvalor <- 1-t_dens(tobs(v, mi0), (length(v)-1))
+  }
+  if (sinal == 'maior'){
+    pvalor <- t_dens(tobs(v, mi0), (length(v)-1))
+  }
+  if (sinal == 'diferente'){
+    pvalor <- 2*min(c(t_dens(tobs(v, mi0), (length(v)-1)), 
+                      1-t_dens(tobs(v, mi0), (length(v)-1))))
+  }
+  # Decide se rejeita ou não a hipótese nula
+  if (alfa>pvalor){
+    rejeito <- "Sim"
+  } 
+  if (alfa<=pvalor) {
+    rejeito <- "Não"
+  }
+  saida <- list(t_observado = tobs(v, mi0), graus_de_liberdade = length(v)-1, 
+                p_valor = pvalor, rejeito_H0 = rejeito)
+  return(saida) 
+}
+```
+
+## Gráficos das distribuições
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+par(mfrow = c(1, 2))
+
+# Distribuição normal
+x <- seq(-5, 5, length.out = 1000)
+densidades_normal <- dnorm(x)
+plot(x, densidades_normal, type = "l", xlab = "x", ylab = "Densidade de Probabilidade",
+     main = "Densidade de Probabilidade - Distribuição Normal",  col.main = "blue",cex.main=0.7)
+lines(x, densidades_normal, col = "blue")
+
+# Distribuição t de Student
+x <- seq(-5, 5, length.out = 1000)
+gl <- 10
+densidades <- sapply(x, t_dens, gl = gl)
+plot(x, densidades, type = "l", xlab = "x", ylab = "Densidade de Probabilidade",
+     main = "Densidade de Probabilidade - Distribuição t de Student", col.main = "blue", cex.main=0.7)
+lines(x, densidades, col = "blue")
+
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+par(mfrow = c(1, 2))
+# beta
+x <- seq(0, 1, length.out = 1000)
+
+beta_values <- sapply(x, function(x) beta(gl = 10))
+
+plot(x, beta_values, type = "l", xlab = "x", ylab = "Valor da Função Beta",
+     main = "Densidade de Probabilidade - Distribuição Beta",  col.main = "blue",cex.main=0.7)
+lines(x, beta_values, col = "blue")
+
+# Qui-quadrado
+x <- seq(0, 10, length.out = 1000)
+
+df <- 5
+
+densidades <- dchisq(x, df)
+
+plot(x, densidades, type = "l", xlab = "x", ylab = "Densidade de Probabilidade",
+     main = "Densidade de Probabilidade - Distribuição Qui-quadrado",  col.main = "blue", cex.main=0.7)
+lines(x, densidades, col = "blue")
+```
+
+## Aplicação do Teste
+
+```{r Definições, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+set.seed(150) #Define a semente
+tamanhos <- seq(5, 1005, 100) # Vetor que informa os tamanhos das amostras
+#Declara as os vetores que vão conter temporariamente a proporção de erros
+#Erros Tipo I
+erro_h0v_bilateral <- vector() #Teste bilateral quando H0 é verdadeira
+erro_h0v_unilateral <- vector() #Teste unilateral quando H0 é verdadeira
+#Erros Tipo II
+erro_h0f_bilateral <- vector() #Teste bilateral quando H0 é falsa
+erro_h0f_unilateral <- vector() #Teste unilateral quando H0 é falsa
+# Criação do vetor de cores
+cores <- c("blue", "red", "pink", "yellow")
+# Criação do vetor de legendas
+legendas <- c("Erro Tipo I - Bilateral", "Erro Tipo I - Unilateral", "Erro Tipo II - Bilateral", "Erro Tipo II - Unilateral")
+```
+
+**Distribuição Normal** $(\mu=0, \sigma^2=1)$)
+
+A distribuição ideal para a aplicação do teste t de Student
+
+```{r Normal, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+# Gerando 1000 amostras de cada tipo e calculando as proporções de erros
+for(i in 1:length(tamanhos)){
+  normal <- list()
+  v_diferente <- vector()
+  v_menor <- vector()
+  f_diferente <- vector()
+  f_menor <- vector()
+  for(j in 1:1000){
+    normal[[j]] <- rnorm(tamanhos[i], 0, 1)
+    # H_0 verdadeira
+    v_diferente[[j]] <- teste(normal[[j]], 0, "diferente", 0.05)$rejeito_H0
+    v_menor[[j]] <- teste(normal[[j]], 0.5, "menor", 0.05)$rejeito_H0
+    # H_0 falsa
+    f_diferente[[j]] <- teste(normal[[j]], -0.5, "diferente", 0.05)$rejeito_H0
+    f_menor[[j]] <- teste(normal[[j]], -0.5, "menor", 0.05)$rejeito_H0
+  }
+  erro_h0v_bilateral[i]=sum(v_diferente=="Sim")/1000
+  erro_h0v_unilateral[i]=sum(v_menor=="Sim")/1000
+  erro_h0f_bilateral[i]=sum(f_diferente=="Não")/1000
+  erro_h0f_unilateral[i]=sum(f_menor=="Não")/1000
+}
+```
+
+```{r Normal Resultado, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+norm <- data.frame(tamanhos,erro_h0v_bilateral, erro_h0v_unilateral, erro_h0f_bilateral, erro_h0f_unilateral)
+
+# Cria a tabela usando kable
+tbl <- kable(norm, caption = "Tabela de Erros: Normal Padrão", align = "c") |> 
+  kable_styling(bootstrap_options = "hover", full_width = TRUE, font_size = 14, fixed_thead = TRUE, position = "left") |> 
+  column_spec(1, bold = TRUE, background = "blue", color = "#E0F0FF") |> 
+  add_header_above(c("Tamanhos" = 1, "Erro do Tipo I" = 1, "Erro do Tipo I" = 1, "Erro do Tipo II" = 1, "Erro do Tipo II" = 1), background = "blue", color = "#E0F0FF") |> 
+  add_header_above(c(" " = 1, "Bilateral" = 1, "Unilateral" = 1, "Bilateral" = 1, "Unilateral" = 1), background = "blue", color = "#E0F0FF")
+tbl <- tbl |> 
+  kableExtra::row_spec(0, extra_css = "display: none;")
+tbl
+```
+
+Ao analisar os resultados da tabela, podemos observar algumas tendências interessantes:
+
+1.  **Erros do Tipo I (falsos positivos):**
+
+-   Em todos os casos, a proporção de erros do Tipo I é relativamente baixa, variando de 0,038 a 0,057.
+
+-   Para o teste bilateral, a proporção de erros do Tipo I é consistente em todos os tamanhos de amostra, indicando uma taxa de erro estável.
+
+**Erros do Tipo II (falsos negativos):**
+
+-   Para o teste bilateral, a proporção de erros do Tipo II é sempre 0, indicando que o poder do teste é 1, ou seja, a capacidade de detectar uma hipótese alternativa verdadeira é perfeita.
+
+-   Para o teste unilateral, a proporção de erros do Tipo II é muito baixa, variando de 0 a 0,002. Isso indica uma alta capacidade de detectar a hipótese alternativa quando ela é verdadeira.
+
+**Tamanho da amostra:**
+
+-   A tabela apresenta resultados para diferentes tamanhos de amostra, variando de 5 a 1005.
+
+-   Não há uma relação aparente entre o tamanho da amostra e as proporções de erros do Tipo I ou Tipo II.
+
+-   Os resultados mostram que mesmo com tamanhos de amostra pequenos (por exemplo, 5), é possível obter uma taxa de erro do Tipo I razoavelmente baixa.
+
+Em geral, os resultados indicam que o procedimento de teste utilizado é eficaz na detecção de hipóteses alternativas quando elas são verdadeiras (baixa taxa de erros do Tipo II) e apresenta uma taxa aceitável de erros do Tipo I. No entanto, é importante ressaltar que essas conclusões são específicas para o contexto e as configurações utilizadas neste código.
+
+```{r Normal Gráfico, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+barplot(t(as.matrix(norm[,-1])), beside = TRUE, col = cores, ylim = c(0, 1), 
+  xlab = "Tamanhos", ylab = "Proporção de Erros",
+  main = "Proporção de Erros na Distribuição Normal Padrão", col.main = "blue",
+  names.arg = norm[, 1])
+legend("topright", legend = legendas, fill = cores, lty = 1, lwd = 2)
+
+```
+
+Para as outras distribuições utilizaremos um código semelhante ao acima, portanto não é nescessário mostrá-lo neste relatório.
+
+**Distribuição t de Student** $(\nu=10)$
+
+A distribuição t de Student é uma distribuição simétrica em torno de zero, mas com caudas mais pesadas do que a distribuição normal.
+
+```{r t Student, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Gerando 1000 amostras de cada tipo e calculando as proporções de erros
+for(i in 1:length(tamanhos)){
+  tstudent <- list()
+  v_diferente <- vector()
+  v_menor <- vector()
+  f_diferente <- vector()
+  f_menor <- vector()
+  for(j in 1:1000){
+    tstudent[[j]] <- rt(tamanhos[i], 10)
+    # H_0 verdadeira
+    v_diferente[[j]] <- teste(tstudent[[j]], 0, "diferente", 0.05)$rejeito_H0
+    v_menor[[j]] <- teste(tstudent[[j]], 0.5, "menor", 0.05)$rejeito_H0
+    # H_0 falsa
+    f_diferente[[j]] <- teste(tstudent[[j]], -0.5, "diferente", 0.05)$rejeito_H0
+    f_menor[[j]] <- teste(tstudent[[j]], -0.5, "menor", 0.05)$rejeito_H0
+  }
+  erro_h0v_bilateral[i]=sum(v_diferente=="Sim")/1000
+  erro_h0v_unilateral[i]=sum(v_menor=="Sim")/1000
+  erro_h0f_bilateral[i]=sum(f_diferente=="Não")/1000
+  erro_h0f_unilateral[i]=sum(f_menor=="Não")/1000
+}
+```
+
+```{r t Student resultado, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+t <- data.frame(tamanhos,erro_h0v_bilateral, erro_h0v_unilateral, erro_h0f_bilateral, erro_h0f_unilateral)
+
+# Cria a tabela usando kable
+tbl2 <- kable(t, caption = "Tabela de Erros", align = "c") |> 
+  kable_styling(bootstrap_options = "hover", full_width = TRUE, font_size = 14, fixed_thead = TRUE, position = "left") |> 
+  column_spec(1, bold = TRUE, background = "blue", color = "#E0F0FF") |> 
+  add_header_above(c("Tamanhos" = 1, "Erro do Tipo I" = 1, "Erro do Tipo I" = 1, "Erro do Tipo II" = 1, "Erro do Tipo II" = 1), background = "blue", color = "#E0F0FF") |> 
+  add_header_above(c(" " = 1, "Bilateral" = 1, "Unilateral" = 1, "Bilateral" = 1, "Unilateral" = 1), background = "blue", color = "#E0F0FF")
+tbl2 <- tbl2 |> 
+  kableExtra::row_spec(0, extra_css = "display: none;")
+tbl2
+```
+
+Para os resultados iguais nas tabelas nos dados gerados na distribuição normal e na distribuição t é que o teste t supõe normalidade, mas a distribuição t tem uma cauda mais pesada. A distribuição t é usada quando a amostra é pequena e a variabilidade populacional é desconhecida, o que requer uma correção para levar em conta a incerteza adicional.
+
+A distribuição normal, por outro lado, é usada quando a amostra é grande ou quando a variabilidade populacional é conhecida. Nesse caso, não há necessidade de usar a distribuição t, e os resultados obtidos nas tabelas serão os mesmos.
+
+É importante lembrar que a distribuição t se aproxima da distribuição normal à medida que o tamanho da amostra aumenta, então os resultados das tabelas se tornarão cada vez mais semelhantes. No entanto, para amostras pequenas, a diferença entre as tabelas se torna mais evidente devido à cauda mais pesada da distribuição t.
+
+```{r t Student Grafico, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+barplot(t(as.matrix(norm[,-1])), beside = TRUE, col = cores, ylim = c(0, 1), 
+  xlab = "Tamanhos", ylab = "Proporção de Erros",
+  main = "Proporção de Erros na Distribuição t (10)",  col.main = "blue",
+  names.arg = t[, 1])
+legend("topright", legend = legendas, fill = cores, lty = 1, lwd = 2)
+```
+
+**Distribuição Qui-Quadrado** $(k=3$)
+
+A distribuição qui-quadrado é assimétrica e possui cauda pesada. É frequentemente utilizada em testes de hipóteses para variâncias e em análises de regressão.
+
+```{r Qui, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Gerando 1000 amostras de cada tipo e calculando as proporções de erros
+for(i in 1:length(tamanhos)){
+  chiquadrado <- list()
+  v_diferente <- vector()
+  v_menor <- vector()
+  f_diferente <- vector()
+  f_menor <- vector()
+  for(j in 1:1000){
+    chiquadrado[[j]] <- rchisq(tamanhos[i], 3)
+    # H_0 verdadeira
+    v_diferente[[j]] <- teste(chiquadrado[[j]], 3, "diferente", 0.05)$rejeito_H0
+    v_menor[[j]] <- teste(chiquadrado[[j]], 3.5, "menor", 0.05)$rejeito_H0
+    # H_0 falsa
+    f_diferente[[j]] <- teste(chiquadrado[[j]], 2.5, "diferente", 0.05)$rejeito_H0
+    f_menor[[j]] <- teste(chiquadrado[[j]], 2.5, "menor", 0.05)$rejeito_H0
+  }
+  erro_h0v_bilateral[i]=sum(v_diferente=="Sim")/1000
+  erro_h0v_unilateral[i]=sum(v_menor=="Sim")/1000
+  erro_h0f_bilateral[i]=sum(f_diferente=="Não")/1000
+  erro_h0f_unilateral[i]=sum(f_menor=="Não")/1000
+}
+```
+
+```{r Qui resultado, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+chi <- data.frame(tamanhos, erro_h0v_bilateral, erro_h0v_unilateral, erro_h0f_bilateral, erro_h0f_unilateral)
+
+
+# Cria a tabela usando kable
+tbl3 <- kable(chi, caption = "Tabela de Erros", align = "c") |> 
+  kable_styling(bootstrap_options = "hover", full_width = TRUE, font_size = 14, fixed_thead = TRUE, position = "left") |> 
+  column_spec(1, bold = TRUE, background = "blue", color = "#E0F0FF") |> 
+  add_header_above(c("Tamanhos" = 1, "Erro do Tipo I" = 1, "Erro do Tipo I" = 1, "Erro do Tipo II" = 1, "Erro do Tipo II" = 1), background = "blue", color = "#E0F0FF") |> 
+  add_header_above(c(" " = 1, "Bilateral" = 1, "Unilateral" = 1, "Bilateral" = 1, "Unilateral" = 1), background = "blue", color = "#E0F0FF")
+
+tbl3 <- tbl3 |> 
+  kableExtra::row_spec(0, extra_css = "display: none;")
+tbl3
+```
+
+Ao analisar a tabela, podemos observar o seguinte:
+
+**Erros do Tipo I (falsos positivos):**
+
+-   Para o teste bilateral, a taxa de erro do Tipo I varia entre 0,046 e 0,057, o que indica que, em média, entre 4,6% e 5,7% das vezes, a hipótese nula é erroneamente rejeitada quando ela é verdadeira.
+
+-   Para o teste unilateral, não foram observados falsos positivos, ou seja, a taxa de erro do Tipo I é igual a 0 para todos os tamanhos de amostra.
+
+**Erros do Tipo II (falsos negativos):**
+
+-   Para o teste bilateral, as taxas de erro do Tipo II variam de 0,863 a 0,001. Isso indica que o teste tem uma alta probabilidade de não rejeitar a hipótese nula quando ela é falsa.
+
+-   Para o teste unilateral, as taxas de erro do Tipo II variam de 0,758 a 0,002, indicando a probabilidade de não rejeitar a hipótese nula quando ela é falsa, em média.
+
+**Tamanho da amostra:**
+
+-   Os resultados são apresentados para diferentes tamanhos de amostra, variando de 5 a 1005. Podemos observar como as proporções de erros do Tipo I e do Tipo II se comportam à medida que o tamanho da amostra aumenta.
+
+Em resumo, os resultados mostram as taxas de erro do Tipo I e do Tipo II para diferentes tamanhos de amostra nos testes bilateral e unilateral. Essas informações são importantes para avaliar a qualidade dos testes estatísticos e sua capacidade de detectar diferenças ou efeitos quando eles existem.
+
+```{r Qui Grafico resultado, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+barplot(t(as.matrix(chi[,-1])), beside = TRUE, col = cores, ylim = c(0, 1),
+  xlab = "Tamanhos", ylab = "Proporção de Erros",
+  main = "Proporção de Erros na Distribuição Qui-Quadrado (3)", col.main = "blue",
+  names.arg = chi[, 1])
+legend("topright", legend = legendas, fill = cores, lty = 1, lwd = 2)
+```
+
+## Resumo
+
+Neste trabalho, foi desenvolvida uma função no software R para realizar o teste t de Student para a média populacional com variância desconhecida. O teste t de Student é amplamente utilizado para determinar se há diferença significativa entre as médias de duas amostras independentes. Foi analisado o desempenho do teste em diferentes distribuições de dados e tamanhos de amostra.
+
+O teste t de Student pressupõe a normalidade dos dados, mas é robusto em relação a essa suposição quando o tamanho da amostra é grande o suficiente. Foram exploradas diversas distribuições, desde aproximadamente normais até assimétricas, para observar o comportamento do teste.
+
+Além disso, foi investigado como a precisão do teste é afetada pelo tamanho da amostra. Foram realizadas simulações com diferentes tamanhos de amostra e foram calculadas as proporções de erros do tipo I (falsos positivos) e do tipo II (falsos negativos). Os resultados mostraram que as proporções de erros do tipo I foram relativamente baixas e estáveis em todos os tamanhos de amostra, enquanto as proporções de erros do tipo II foram sempre zero para o teste bilateral.
+
+Esse estudo forneceu uma compreensão mais aprofundada do desempenho do teste t de Student em diferentes situações, auxiliando na interpretação adequada dos resultados e na escolha adequada deste teste estatístico em estudos futuros.
