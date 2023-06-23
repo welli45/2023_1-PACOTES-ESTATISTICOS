@@ -1,0 +1,40 @@
+---
+title: "Estudos"
+author: "Wellington S. S."
+date: "2023-05-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+smaller <- diamonds %>% 
+  filter(carat <= 2.5)
+```
+
+We have data about `r nrow(diamonds)` diamonds. Only `r nrow(diamonds) - nrow(smaller)` are larger than 2.5 carats. The distribution of the remainder is shown below:
+
+```{r}
+smaller %>% 
+  ggplot(aes(carat)) + 
+  geom_freqpoly(binwidth = 0.01)
+```
+
+```{r}
+?knitr::kable
+```
+
+```{r}
+# Com o pander
+library(pander)
+x = matrix(rnorm(40), 5)
+dimnames(x) = list(NULL, head(LETTERS, ncol(x)))
+panderOptions("digits", 2)
+pander(x)
+x
+```
