@@ -4,6 +4,10 @@
 # This is their first attempt:
 #
 
+# O erro ocorre porque não está referenciando corretamente o valor
+# selecionado pelo usuário.
+# Aqui está o código corrigido
+
 library(shiny)
 
 ui <- fluidPage(
@@ -14,7 +18,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   output$product <- renderText({
-    x * 5
+    input$x * 5
   })
 }
 
